@@ -19,22 +19,21 @@ import {
   TableRow,
 } from "./Table";
 
-export type AnyColumnDef<TData> =
-  // oxlint-disable-next-line typescript/no-explicit-any
-  | ColumnDef<TData, any>
-  // oxlint-disable-next-line typescript/no-explicit-any
-  | AccessorFnColumnDef<TData, any>
-  // oxlint-disable-next-line typescript/no-explicit-any
-  | AccessorKeyColumnDef<TData, any>;
+export type AnyColumnDef<TData, TValue> =
+  | ColumnDef<TData, TValue>
+  | AccessorFnColumnDef<TData, TValue>
+  | AccessorKeyColumnDef<TData, TValue>;
 
-type DataTableProps<TData> = {
-  columns: AnyColumnDef<TData>[];
+type DataTableProps<TData, TValue> = {
+  columns: AnyColumnDef<TData, TValue>[];
   data: TData[];
 };
 
-export function DataTable<TData>(props: DataTableProps<TData>): JSXElement {
+export function DataTable<TData, TValue>(
+  props: DataTableProps<TData, TValue>,
+): JSXElement {
   const [sorting, setSorting] = createSignal<SortingState>([]);
-  const table = createSolidTable({
+  const table = createSolidTable<TData>({
     get data() {
       return props.data;
     },
