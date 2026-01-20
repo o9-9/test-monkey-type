@@ -12,6 +12,8 @@ import AsyncContent from "../common/AsyncContent";
 import { Button } from "../common/Button";
 import { ChartJs } from "../common/ChartJs";
 
+import { FriendsList } from "./friends/FriendsList";
+
 function H2(props: { icon: string; text: string }): JSXElement {
   return (
     <h2 class="text-sub flex place-items-center gap-4 pb-4 text-4xl">
@@ -53,6 +55,8 @@ export function AboutPage(): JSXElement {
 
   return (
     <Show when={isOpen}>
+      <FriendsList />
+
       <section class="text-sub text-center">
         Created with love by Miodec.
         <br />
