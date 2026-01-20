@@ -1,7 +1,7 @@
 import type { Component, ComponentProps } from "solid-js";
 import { splitProps } from "solid-js";
 
-import { cn } from "../../utils/cn";
+import { cn } from "../../../utils/cn";
 
 const Table: Component<ComponentProps<"table">> = (props) => {
   const [local, others] = splitProps(props, ["class"]);
@@ -51,9 +51,11 @@ const TableRow: Component<ComponentProps<"tr">> = (props) => {
 };
 
 const TableHead: Component<ComponentProps<"th">> = (props) => {
-  const [local, others] = splitProps(props, ["class"]);
+  const [local, others] = splitProps(props, ["class", "aria-label"]);
+  console.log(others);
   return (
     <th
+      aria-label={local["aria-label"]}
       class={cn(
         "text-muted-foreground h-10 px-2 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0",
         local.class,
@@ -65,10 +67,11 @@ const TableHead: Component<ComponentProps<"th">> = (props) => {
 
 const TableCell: Component<ComponentProps<"td">> = (props) => {
   const [local, others] = splitProps(props, ["class"]);
+  console.log("others", others);
   return (
     <td
-      class={cn("p-2 align-middle [&:has([role=checkbox])]:pr-0", local.class)}
       {...others}
+      class={cn("p-2 align-middle [&:has([role=checkbox])]:pr-0", local.class)}
     />
   );
 };
@@ -85,11 +88,11 @@ const TableCaption: Component<ComponentProps<"caption">> = (props) => {
 
 export {
   Table,
-  TableHeader,
   TableBody,
+  TableCaption,
+  TableCell,
   TableFooter,
   TableHead,
+  TableHeader,
   TableRow,
-  TableCell,
-  TableCaption,
 };

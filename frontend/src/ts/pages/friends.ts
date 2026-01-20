@@ -1,37 +1,37 @@
-import Page from "./page";
-import * as Skeleton from "../utils/skeleton";
-import { SimpleModal } from "../utils/simple-modal";
-import Ape from "../ape";
-import {
-  intervalToDuration,
-  format as dateFormat,
-  formatDuration,
-  formatDistanceToNow,
-  format,
-} from "date-fns";
-import * as Notifications from "../elements/notifications";
-import { isSafeNumber } from "@monkeytype/util/numbers";
-import { getHTMLById as getBadgeHTMLbyId } from "../controllers/badge-controller";
-import { formatXp, getXpDetails } from "../utils/levels";
-import { secondsToString } from "../utils/date-and-time";
-import { PersonalBest } from "@monkeytype/schemas/shared";
-import Format from "../utils/format";
-import { getHtmlByUserFlags } from "../controllers/user-flag-controller";
-import { SortedTable, SortSchema } from "../utils/sorted-table";
-import { getAvatarElement } from "../utils/discord-avatar";
-import { formatTypingStatsRatio } from "../utils/misc";
-import { getLanguageDisplayString } from "../utils/strings";
-import * as DB from "../db";
-import { getAuthenticatedUser } from "../firebase";
-import * as ServerConfiguration from "../ape/server-configuration";
-import * as AuthEvent from "../observables/auth-event";
 import { Connection } from "@monkeytype/schemas/connections";
+import { PersonalBest } from "@monkeytype/schemas/shared";
 import { Friend, UserNameSchema } from "@monkeytype/schemas/users";
+import { isSafeNumber } from "@monkeytype/util/numbers";
+import {
+  format as dateFormat,
+  format,
+  formatDistanceToNow,
+  formatDuration,
+  intervalToDuration,
+} from "date-fns";
+import Ape from "../ape";
+import * as ServerConfiguration from "../ape/server-configuration";
+import { getHTMLById as getBadgeHTMLbyId } from "../controllers/badge-controller";
+import { getHtmlByUserFlags } from "../controllers/user-flag-controller";
+import * as DB from "../db";
+import * as Notifications from "../elements/notifications";
+import { getAuthenticatedUser } from "../firebase";
+import * as AuthEvent from "../observables/auth-event";
+import { secondsToString } from "../utils/date-and-time";
+import { getAvatarElement } from "../utils/discord-avatar";
+import Format from "../utils/format";
+import { formatXp, getXpDetails } from "../utils/levels";
+import { formatTypingStatsRatio } from "../utils/misc";
+import { SimpleModal } from "../utils/simple-modal";
+import * as Skeleton from "../utils/skeleton";
+import { SortedTable, SortSchema } from "../utils/sorted-table";
+import { getLanguageDisplayString } from "../utils/strings";
+import Page from "./page";
 
-import { showLoaderBar, hideLoaderBar } from "../signals/loader-bar";
+import { hideLoaderBar, showLoaderBar } from "../signals/loader-bar";
+import { onDOMReady, qs, qsr } from "../utils/dom";
 import { LocalStorageWithSchema } from "../utils/local-storage-with-schema";
 import { remoteValidation } from "../utils/remote-validation";
-import { qs, qsr, onDOMReady } from "../utils/dom";
 
 let friendsTable: SortedTable<Friend> | undefined = undefined;
 

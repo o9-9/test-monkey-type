@@ -17,14 +17,13 @@ import {
   TableRow,
 } from "./Table";
 
-type DataTableProps<TData, TValue> = {
-  columns: ColumnDef<TData, TValue>[];
+type DataTableProps<TData> = {
+  // oxlint-disable-next-line typescript/no-explicit-any
+  columns: ColumnDef<TData, any>[];
   data: TData[];
 };
 
-export function DataTable<TData, TValue>(
-  props: DataTableProps<TData, TValue>,
-): JSXElement {
+export function DataTable<TData>(props: DataTableProps<TData>): JSXElement {
   const [sorting, setSorting] = createSignal<SortingState>([]);
   const table = createSolidTable({
     get data() {
@@ -52,7 +51,16 @@ export function DataTable<TData, TValue>(
               <TableRow>
                 <For each={headerGroup.headers}>
                   {(header) => (
-                    <TableHead colSpan={header.colSpan}>
+                    <TableHead
+                      colSpan={header.colSpan}
+                      aria-sort={
+                        header.column.getIsSorted() === "asc"
+                          ? "ascending"
+                          : header.column.getIsSorted() === "desc"
+                            ? "descending"
+                            : "none"
+                      }
+                    >
                       <Show when={!header.isPlaceholder}>
                         {flexRender(
                           header.column.columnDef.header,
@@ -84,14 +92,30 @@ export function DataTable<TData, TValue>(
               {(row) => (
                 <TableRow data-state={row.getIsSelected() && "selected"}>
                   <For each={row.getVisibleCells()}>
-                    {(cell) => (
-                      <TableCell>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    )}
+                    {(cell) => {
+                      // oxlint-disable-next-line typescript/no-unsafe-assignment
+                      const cellMeta =
+                        cell.column.columnDef.meta?.cellMeta === undefined
+                          ? {}
+                          : typeof cell.column.columnDef.meta?.cellMeta ===
+                              "function"
+                            ? // oxlint-disable-next-line typescript/no-unsafe-call
+                              cell.column.columnDef.meta.cellMeta({
+                                value: cell.getValue(),
+                                row: cell.row,
+                                column: cell.column,
+                              })
+                            : cell.column.columnDef.meta?.cellMeta;
+
+                      return (
+                        <TableCell {...cellMeta}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      );
+                    }}
                   </For>
                 </TableRow>
               )}
