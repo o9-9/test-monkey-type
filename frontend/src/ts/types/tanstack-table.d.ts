@@ -1,7 +1,9 @@
-import "@tanstack/solid-table"; //or vue, svelte, solid, qwik, etc.
+import "@tanstack/solid-table";
 
 declare module "@tanstack/solid-table" {
-  type ColumnMeta<TData extends RowData, TValue> = {
+  //This needs to be an interface
+  // oxlint-disable-next-line typescript/consistent-type-definitions
+  interface ColumnMeta<TData extends RowData, TValue> {
     foo?: string;
     cellMeta?:
       | JSX.HTMLAttributes<HTMLTableCellElement>
@@ -10,5 +12,5 @@ declare module "@tanstack/solid-table" {
           row: TData; // the original row data
           column: import("@tanstack/solid-table").Column<TData, TValue>;
         }) => JSX.HTMLAttributes<HTMLTableCellElement>);
-  };
+  }
 }
