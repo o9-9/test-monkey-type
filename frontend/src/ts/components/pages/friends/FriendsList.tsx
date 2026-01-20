@@ -9,18 +9,57 @@ import { intervalToDuration } from "date-fns/intervalToDuration";
 import { createResource, JSXElement } from "solid-js";
 
 import Ape from "../../../ape";
+import { getHTMLById } from "../../../controllers/badge-controller";
+import {
+  getHtmlByUserFlags,
+  SupportsFlags,
+} from "../../../controllers/user-flag-controller";
 import { getActivePage } from "../../../signals/core";
+import { secondsToString } from "../../../utils/date-and-time";
 import Format from "../../../utils/format";
+import { getXpDetails } from "../../../utils/levels";
+import { formatTypingStatsRatio } from "../../../utils/misc";
 import { getLanguageDisplayString } from "../../../utils/strings";
 import AsyncContent from "../../common/AsyncContent";
 import { DataTable } from "../../ui/table/DataTable";
 import { TableColumnHeader } from "../../ui/table/TableColumnHeader";
 
+/* todo test
+const sortByNumber = (rowA, rowB, columnId) =>
+  rowA.getValue(columnId) - rowB.getValue(columnId);
+*/
+
+const FriendName = (props: {
+  friend: Pick<Friend, "uid" | "name" | "badgeId"> & SupportsFlags;
+}): JSXElement => {
+  return (
+    <div class="avatarNameBadge">
+      <div class="avatarPlaceholder"></div>
+      <a
+        href={`${location.origin}/profile/${props.friend.uid}?isUid`}
+        class="entryName"
+        data-uid={props.friend.uid}
+        // oxlint-disable-next-line react/no-unknown-property
+        router-link
+      >
+        {props.friend.name}
+      </a>
+      <div class="flagsAndBadge">
+        {getHtmlByUserFlags(props.friend)}
+        {isSafeNumber(props.friend.badgeId)
+          ? getHTMLById(props.friend.badgeId)
+          : ""}
+      </div>
+    </div>
+  );
+};
+
 const columnHelper = createColumnHelper<Friend>();
 const columns = [
   columnHelper.accessor("name", {
     header: (props) => <TableColumnHeader column={props.column} title="name" />,
-    cell: (info) => info.getValue(),
+    enableSorting: true,
+    cell: ({ row }) => <FriendName friend={row.original} />,
   }),
 
   columnHelper.accessor("lastModified", {
@@ -28,20 +67,128 @@ const columns = [
       <TableColumnHeader column={props.column} title="friends for" />
     ),
     enableSorting: true,
-    cell: (info) => {
-      const value = info.getValue();
-      return value === undefined ? "-" : formatAge(value, "short");
-    },
+    cell: ({ getValue }) =>
+      getValue() === undefined ? "-" : formatAge(getValue(), "short"),
     meta: {
-      // @ts-expect-error huh?
-      cellMeta: ({ value }) => {
-        return value === undefined
+      cellMeta: ({ value }) =>
+        value === undefined
           ? {}
           : {
               "data-balloon-pos": "down",
               "aria-label": `since ${dateFormat(value, "dd MMM yyy HH:mm")}`,
+            },
+    },
+  }),
+
+  columnHelper.accessor("xp", {
+    header: (props) => (
+      <TableColumnHeader column={props.column} title="level" />
+    ),
+    enableSorting: true,
+    cell: ({ getValue }) => getXpDetails(getValue() ?? 0).level,
+  }),
+
+  columnHelper.accessor("completedTests", {
+    header: (props) => (
+      <TableColumnHeader
+        column={props.column}
+        title="tests"
+        aria-label="completed / started"
+        data-balloon-pos="down"
+      />
+    ),
+    enableSorting: true,
+    cell: (info) => `${info.getValue()}/${info.row.original.startedTests}`,
+    meta: {
+      // @ts-expect-error figure out
+      cellMeta: ({ row }) => {
+        const testStats = formatTypingStatsRatio(row.original);
+
+        return {
+          "data-balloon-pos": "down",
+          "aria-label": `${testStats.completedPercentage}% (${
+            testStats.restartRatio
+          } restarts per completed test)`,
+        };
+      },
+    },
+  }),
+
+  columnHelper.accessor("timeTyping", {
+    header: (props) => (
+      <TableColumnHeader column={props.column} title="time typing" />
+    ),
+    enableSorting: true,
+    cell: ({ getValue }) =>
+      secondsToString(Math.round(getValue() ?? 0), true, true),
+  }),
+
+  columnHelper.accessor("streak.length", {
+    header: (props) => (
+      <TableColumnHeader column={props.column} title="streak" />
+    ),
+    enableSorting: true,
+    cell: ({ getValue }) => formatStreak(getValue()),
+    meta: {
+      cellMeta: ({ row }) => {
+        const value = row.original.streak.maxLength as number | undefined;
+        return value === undefined
+          ? {}
+          : {
+              "data-balloon-pos": "down",
+              "aria-label": formatStreak(value, "longest streak"),
             };
       },
+    },
+  }),
+
+  columnHelper.accessor("top15.wpm", {
+    header: (props) => (
+      <TableColumnHeader column={props.column} title="time 15 pb" />
+    ),
+    enableSorting: true,
+    cell: (info) => {
+      const pb = formatPb(info.row.original.top15);
+      return (
+        <>
+          {pb?.wpm ?? "-"}
+          <div>{pb?.acc ?? "-"}</div>
+        </>
+      );
+    },
+    meta: {
+      // @ts-expect-error figure out
+      cellMeta: ({ row }) => ({
+        "data-balloon-pos": "down",
+        "data-balloon-break": "",
+        // oxlint-disable-next-line typescript/no-unsafe-member-access typescript/no-unsafe-argument
+        "aria-label": formatPb(row.original.top15 as PersonalBest)?.details,
+      }),
+    },
+  }),
+
+  columnHelper.accessor("top60.wpm", {
+    header: (props) => (
+      <TableColumnHeader column={props.column} title="time 60 pb" />
+    ),
+    enableSorting: true,
+    cell: (info) => {
+      const pb = formatPb(info.row.original.top60);
+      return (
+        <>
+          {pb?.wpm ?? "-"}
+          <div>{pb?.acc ?? "-"}</div>
+        </>
+      );
+    },
+    meta: {
+      // @ts-expect-error figure out
+      cellMeta: ({ row }) => ({
+        "data-balloon-pos": "down",
+        "data-balloon-break": "",
+        // oxlint-disable-next-line typescript/no-unsafe-member-access typescript/no-unsafe-argument
+        "aria-label": formatPb(row.original.top60)?.details,
+      }),
     },
   }),
 ];

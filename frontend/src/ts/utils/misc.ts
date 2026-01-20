@@ -1,12 +1,12 @@
-import { showLoaderBar, hideLoaderBar } from "../signals/loader-bar";
-import { envConfig } from "virtual:env-config";
-import { lastElementFromArray } from "./arrays";
 import { Config } from "@monkeytype/schemas/configs";
-import { Mode, Mode2, PersonalBests } from "@monkeytype/schemas/shared";
 import { Result } from "@monkeytype/schemas/results";
+import { Mode, Mode2, PersonalBests } from "@monkeytype/schemas/shared";
 import { RankAndCount } from "@monkeytype/schemas/users";
 import { roundTo2 } from "@monkeytype/util/numbers";
 import { animate, AnimationParams } from "animejs";
+import { envConfig } from "virtual:env-config";
+import { hideLoaderBar, showLoaderBar } from "../signals/loader-bar";
+import { lastElementFromArray } from "./arrays";
 import { ElementWithUtils } from "./dom";
 
 export function whorf(speed: number, wordlen: number): number {

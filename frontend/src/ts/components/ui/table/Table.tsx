@@ -52,7 +52,6 @@ const TableRow: Component<ComponentProps<"tr">> = (props) => {
 
 const TableHead: Component<ComponentProps<"th">> = (props) => {
   const [local, others] = splitProps(props, ["class", "aria-label"]);
-  console.log(others);
   return (
     <th
       aria-label={local["aria-label"]}
@@ -67,7 +66,6 @@ const TableHead: Component<ComponentProps<"th">> = (props) => {
 
 const TableCell: Component<ComponentProps<"td">> = (props) => {
   const [local, others] = splitProps(props, ["class"]);
-  console.log("others", others);
   return (
     <td
       {...others}

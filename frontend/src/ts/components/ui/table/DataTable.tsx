@@ -1,4 +1,6 @@
 import {
+  AccessorFnColumnDef,
+  AccessorKeyColumnDef,
   ColumnDef,
   createSolidTable,
   flexRender,
@@ -17,9 +19,16 @@ import {
   TableRow,
 } from "./Table";
 
-type DataTableProps<TData> = {
+export type AnyColumnDef<TData> =
   // oxlint-disable-next-line typescript/no-explicit-any
-  columns: ColumnDef<TData, any>[];
+  | ColumnDef<TData, any>
+  // oxlint-disable-next-line typescript/no-explicit-any
+  | AccessorFnColumnDef<TData, any>
+  // oxlint-disable-next-line typescript/no-explicit-any
+  | AccessorKeyColumnDef<TData, any>;
+
+type DataTableProps<TData> = {
+  columns: AnyColumnDef<TData>[];
   data: TData[];
 };
 
@@ -93,19 +102,15 @@ export function DataTable<TData>(props: DataTableProps<TData>): JSXElement {
                 <TableRow data-state={row.getIsSelected() && "selected"}>
                   <For each={row.getVisibleCells()}>
                     {(cell) => {
-                      // oxlint-disable-next-line typescript/no-unsafe-assignment
                       const cellMeta =
-                        cell.column.columnDef.meta?.cellMeta === undefined
-                          ? {}
-                          : typeof cell.column.columnDef.meta?.cellMeta ===
-                              "function"
-                            ? // oxlint-disable-next-line typescript/no-unsafe-call
-                              cell.column.columnDef.meta.cellMeta({
-                                value: cell.getValue(),
-                                row: cell.row,
-                                column: cell.column,
-                              })
-                            : cell.column.columnDef.meta?.cellMeta;
+                        typeof cell.column.columnDef.meta?.cellMeta ===
+                        "function"
+                          ? cell.column.columnDef.meta.cellMeta({
+                              value: cell.getValue(), // number
+                              row: cell.row, // raw row
+                              column: cell.column,
+                            })
+                          : (cell.column.columnDef.meta?.cellMeta ?? {});
 
                       return (
                         <TableCell {...cellMeta}>
