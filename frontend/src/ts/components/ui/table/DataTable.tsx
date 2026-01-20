@@ -29,8 +29,9 @@ type DataTableProps<TData, TValue> = {
   data: TData[];
 };
 
-export function DataTable<TData, TValue>(
-  props: DataTableProps<TData, TValue>,
+export function DataTable<TData>(
+  // oxlint-disable-next-line typescript/no-explicit-any
+  props: DataTableProps<TData, any>,
 ): JSXElement {
   const [sorting, setSorting] = createSignal<SortingState>([]);
   const table = createSolidTable<TData>({
@@ -105,12 +106,10 @@ export function DataTable<TData, TValue>(
                         typeof cell.column.columnDef.meta?.cellMeta ===
                         "function"
                           ? cell.column.columnDef.meta.cellMeta({
-                              value: cell.getValue(), // number
-                              row: cell.row, // raw row
-                              column: cell.column,
+                              value: cell.getValue(),
+                              row: cell.row.original,
                             })
                           : (cell.column.columnDef.meta?.cellMeta ?? {});
-
                       return (
                         <TableCell {...cellMeta}>
                           {flexRender(

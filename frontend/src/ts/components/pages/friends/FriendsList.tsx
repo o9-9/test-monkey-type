@@ -100,9 +100,8 @@ const columns = [
     enableSorting: true,
     cell: (info) => `${info.getValue()}/${info.row.original.startedTests}`,
     meta: {
-      // @ts-expect-error figure out
       cellMeta: ({ row }) => {
-        const testStats = formatTypingStatsRatio(row.original);
+        const testStats = formatTypingStatsRatio(row);
 
         return {
           "data-balloon-pos": "down",
@@ -131,7 +130,7 @@ const columns = [
     cell: ({ getValue }) => formatStreak(getValue()),
     meta: {
       cellMeta: ({ row }) => {
-        const value = row.original.streak.maxLength as number | undefined;
+        const value = row.streak.maxLength as number | undefined;
         return value === undefined
           ? {}
           : {
@@ -157,12 +156,10 @@ const columns = [
       );
     },
     meta: {
-      // @ts-expect-error figure out
       cellMeta: ({ row }) => ({
         "data-balloon-pos": "down",
         "data-balloon-break": "",
-        // oxlint-disable-next-line typescript/no-unsafe-member-access typescript/no-unsafe-argument
-        "aria-label": formatPb(row.original.top15 as PersonalBest)?.details,
+        "aria-label": formatPb(row.top15 as PersonalBest)?.details,
       }),
     },
   }),
@@ -182,12 +179,10 @@ const columns = [
       );
     },
     meta: {
-      // @ts-expect-error figure out
       cellMeta: ({ row }) => ({
         "data-balloon-pos": "down",
         "data-balloon-break": "",
-        // oxlint-disable-next-line typescript/no-unsafe-member-access typescript/no-unsafe-argument
-        "aria-label": formatPb(row.original.top60)?.details,
+        "aria-label": formatPb(row.top60)?.details,
       }),
     },
   }),
